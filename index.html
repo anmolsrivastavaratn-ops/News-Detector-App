@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>News Checker</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="container">
+  <h2>📰 Verify News</h2>
+
+  <textarea id="newsInput" placeholder="Paste news here..."></textarea>
+  <button onclick="checkNews()">Verify</button>
+
+  <div id="result"></div>
+</div>
+
+<script>
+async function checkNews() {
+
+  const text = document.getElementById("newsInput").value;
+  const resultDiv = document.getElementById("result");
+  const apiKey = "d0f04f34ae1a465992b47be818e603c9";
+
+  if (!text) {
+    resultDiv.innerHTML = "Enter news text first.";
+    return;
+  }
+
+  const keywords = text.split(" ").slice(0,5).join(" ");
+  resultDiv.innerHTML = "Checking...";
+
+  try {
+    const response = await fetch(
+      `https://newsapi.org/v2/everything?q=${encodeURIComponent(keywords)}&pageSize=3&apiKey=${apiKey}`
+    );
+
+    const data = await response.json();
+
+    if (data.articles && data.articles.length > 0) {
+
+      resultDiv.innerHTML = "<p class='real'>✅ Likely Real News</p>";
+
+      data.articles.forEach(article => {
+        resultDiv.innerHTML += `
+          <p><b>${article.title}</b><br>
+          <small>${article.source.name}</small></p>
+        `;
+      });
+
+    } else {
+      resultDiv.innerHTML = "<p class='fake'>❌ Possibly Fake News</p>";
+    }
+
+  } catch (error) {
+    resultDiv.innerHTML = "Error fetching news.";
+  }
+}
+</script>
+
+</body>
+</html>
